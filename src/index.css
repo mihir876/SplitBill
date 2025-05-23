@@ -1,176 +1,339 @@
-:root {
-  --color-lightest: #fff4e6;
-  --color-light: #ffe8cc;
-  --color-medium: #ffa94d;
-  --color-dark: #ff922b;
-}
-
+/* Reset and base */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-html {
-  font-size: 62.5%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
-
-body {
-  height: 100vh;
-  color: #495057;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* background-image: url('path/to/your/background.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat; */
-}
-
-.app {
-  min-height: 66vh;
-  display: grid;
-  grid-template-columns: 36rem 44rem;
-  column-gap: 4rem;
-  align-items: start;
-  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for better contrast */
-  padding: 2rem;
-  border-radius: 10px;
-}
-
-.button {
-  background-color: var(--color-medium);
-  color: #343a40;
-  padding: 0.8rem 1.2rem;
-  border: none;
-  border-radius: 7px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.button:hover {
-  background-color: var(--color-dark);
-  transform: translateY(-2px); /* Slight lift effect on hover */
-}
-
-.sidebar ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  font-size: 1.4rem;
-  margin-bottom: 2rem;
-}
-
-.sidebar li {
-  display: grid;
-  grid-template-columns: 4.8rem 1fr auto;
-  align-items: center;
-  column-gap: 1.6rem;
-  padding: 1.2rem;
-  border-radius: 7px;
-  transition: background-color 0.5s;
-}
-
-.selected,
-.sidebar li:hover {
-  background-color: var(--color-lightest);
-}
-
-.sidebar li img {
-  border-radius: 50%;
+body, html, #root {
+  height: 100%;
   width: 100%;
-  grid-row: span 2;
 }
 
-.sidebar li h3 {
-  grid-row: 1;
-  grid-column: 2;
+body.light {
+  background: linear-gradient(135deg, #ff8008, #ffc837); /* Orange gradient */
+  position: relative;
+  overflow-x: hidden;
 }
 
-.sidebar li p {
-  grid-row: 2;
-  grid-column: 2;
+body.dark {
+  background: #121212;
+  color: #f0f0f0;
 }
 
-.sidebar li .button {
-  grid-row: span 2;
-  grid-column: 3;
+/* White dots background effect for light mode */
+body.light::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 10px 10px, rgba(255 255 255 / 0.3), transparent),
+    radial-gradient(2px 2px at 50px 50px, rgba(255 255 255 / 0.3), transparent),
+    radial-gradient(2px 2px at 90px 90px, rgba(255 255 255 / 0.3), transparent);
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  z-index: 0;
 }
 
-.sidebar > .button {
-  float: right;
-  margin-right: 1.2rem;
+/* Remove dots in dark mode */
+body.dark::before {
+  display: none;
 }
 
-.green {
-  color: #66a80f;
+/* Container for main content */
+.main-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
-.red {
-  color: #e03131;
-}
-
-form {
-  font-size: 1.6rem;
-  display: grid;
+/* Header styles */
+header {
+  background-color: white;
+  padding: 1rem 2rem;
+  display: flex;
   align-items: center;
-  gap: 1.2rem;
-  background-color: var(--color-lightest);
-  border-radius: 7px;
-  padding: 2rem; /* Added padding for better spacing */
-}
-
-.form-add-friend {
-  grid-template-columns: 1fr 1.5fr;
-  margin-bottom: 1.6rem;
-}
-
-.form-split-bill {
-  grid-template-columns: 1fr 12rem;
-  padding: 3.2rem 4rem;
-}
-
-label {
-  font-weight: 500;
-}
-
-label::first-letter {
-  display: inline-block;
-  margin-right: 4px;
+  justify-content: space-between;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 8px rgb(255 128 8 / 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  color: #ff8008; /* Orange text */
+  font-weight: 700;
   font-size: 1.8rem;
 }
 
-input,
-select {
-  font-family: inherit;
+body.dark header {
+  background-color: #ff8008;
+  color: white;
+  box-shadow: 0 4px 8px rgb(255 255 255 / 0.3);
+}
+
+/* Header toggle button */
+.toggle-btn {
+  background: #ff8008;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #ffc837;
+  color: #333;
+}
+
+body.dark .toggle-btn {
+  background: white;
+  color: #ff8008;
+}
+
+body.dark .toggle-btn:hover {
+  background-color: #ffa500;
+  color: white;
+}
+
+/* Card styles - FriendList and ExpenseForm containers */
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 15px rgb(255 128 8 / 0.2);
+  flex: 1 1 400px;
+  max-width: 480px;
+  position: relative;
+  border: 2px solid transparent;
+  transition: border 0.4s ease, box-shadow 0.4s ease;
+  z-index: 1;
+}
+
+/* Border animation on hover */
+.card:hover {
+  border: 2px solid #ff8008;
+  box-shadow: 0 8px 25px rgb(255 128 8 / 0.5);
+}
+
+/* Dark mode card */
+body.dark .card {
+  background-color: #222222;
+  color: #f0f0f0;
+  box-shadow: 0 8px 15px rgb(255 255 255 / 0.15);
+}
+
+body.dark .card:hover {
+  border: 2px solid #ffc837;
+  box-shadow: 0 8px 25px rgb(255 255 255 / 0.5);
+}
+
+/* Section titles */
+.card h2 {
+  margin-bottom: 1rem;
+  font-weight: 700;
   color: inherit;
-  font-size: 1.5rem;
-  padding: 0.7rem;
-  text-align: center;
-  border: 1px solid var(--color-light);
-  border-radius: 4px;
-  transition: border-color 0.3s;
+}
+
+/* Friend list styles */
+.card ul {
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding-left: 0;
+}
+
+.card ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.card ul li.selected {
+  background-color: #ff8008;
+  color: white;
+  font-weight: 700;
+}
+
+body.dark .card ul li.selected {
+  background-color: #ffc837;
+  color: black;
+}
+
+.card ul li:hover:not(.selected) {
+  background-color: #ffe5cc;
+  color: #cc6600;
+}
+
+body.dark .card ul li:hover:not(.selected) {
+  background-color: #444;
+  color: #ffc837;
+}
+
+/* Remove button in friend list */
+.remove-btn {
+  background-color: transparent;
+  border: none;
+  color: #ff8008;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-left: 1rem;
+}
+
+.remove-btn:hover {
+  color: #cc6600;
+}
+
+body.dark .remove-btn {
+  color: #ffc837;
+}
+
+body.dark .remove-btn:hover {
+  color: #e6b800;
+}
+
+/* Forms styling */
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 2px solid #ff8008;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background-color: white;
+  color: #333;
+}
+
+input::placeholder {
+  color: #cc6600;
+  font-weight: 500;
 }
 
 input:focus,
 select:focus {
-  outline: none;
-  border: 1px solid var(--color-dark);
+  border-color: #ffc837;
+  background-color: #fff7e6;
 }
 
-form .button {
-  margin-top: 0.6rem;
-  grid-column: 2;
+/* Dark mode form inputs */
+body.dark input[type="text"],
+body.dark input[type="number"],
+body.dark select {
+  background-color: #333;
+  color: #f0f0f0;
+  border-color: #ffc837;
 }
 
-form h2 {
-  grid-column: 1 / -1;
-  font-size: 2.2rem;
-  text-transform: uppercase;
-  letter-spacing: -0.5px;
-  margin-bottom: 1.6rem;
+body.dark input::placeholder {
+  color: #ffd966;
+}
+
+/* Button in form */
+.add-btn {
+  background-color: #ff8008;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.add-btn:hover {
+  background-color: #ffc837;
+  color: #333;
+}
+
+body.dark .add-btn {
+  background-color: #ffc837;
+  color: #333;
+}
+
+body.dark .add-btn:hover {
+  background-color: #ff8008;
+  color: white;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  .main-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    max-width: 90vw;
+  }
+}
+
+/* Fix alignment in form labels and inputs */
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+/* Scrollbar styling for friend list */
+.card ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card ul::-webkit-scrollbar-thumb {
+  background-color: #ff8008;
+  border-radius: 8px;
+}
+
+body.dark .card ul::-webkit-scrollbar-thumb {
+  background-color: #ffc837;
+}
+
+/* Friend amount styling */
+.card ul li span.amount {
+  font-weight: 700;
+  margin-left: 0.5rem;
+  color: inherit;
+}
+@media (max-width: 600px) {
+  header {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.2rem;
+  }
+
+  .toggle-btn {
+    padding: 0.5rem;
+    font-size: 0; /* Hide button text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toggle-btn::before {
+    content: "🌓"; /* Replace with icon (or font-awesome class if you're using it) */
+    font-size: 1.2rem;
+    color: inherit;
+  }
 }

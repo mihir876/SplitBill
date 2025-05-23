@@ -1,140 +1,84 @@
-import FriendsList from "./components/FriendsList";
-import Button from "./components/includes/Button";
-import FormToAddFriend from "./components/FormToAddFriend";
-import FormSplitBill from "./components/FormSplitBill";
-import {useReducer} from "react";
-import SideBar from "./components/SideBar";
+import React, { useState } from "react";
+import Header from "./Header";
+import FriendList from "./FriendList";
+import ExpenseForm from "./ExpenseForm";
 
-const initialFriends = [
-  {
-    id     : 118836,
-    name   : "Riya",
-    image  : "https://i.pravatar.cc/48?u=118836",
-    balance: -7
-  }, {
-    id     : 933372,
-    name   : "Naina",
-    image  : "https://i.pravatar.cc/48?u=933372",
-    balance: 20
-  }, {
-    id     : 499476,
-    name   : "Rahul",
-    image  : "https://i.pravatar.cc/48?u=499476",
-    balance: 0
-  }
-];
+function App() {
+  const [friends, setFriends] = useState([]);
+  const [selectedFriendId, setSelectedFriendId] = useState(null);
+  const [expenses, setExpenses] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
 
-const ACTIONS = {
-  SET_SHOW_ADD_FRIEND: "setShowAddFriend",
-  SET_SELECTED_FRIEND: "setSelectedFriend",
-  SET_FRIENDS        : "setFriends",
-  HANDLE_SPLIT_BILL  : "handleSplitBill"
-};
+  const addFriend = (name) => {
+    const newFriend = {
+      id: Date.now(),
+      name,
+      currentAmount: 0,
+    };
+    setFriends((prev) => [...prev, newFriend]);
+    setSelectedFriendId(newFriend.id);
+  };
 
-const initialState = {
-  showAddFriend: false, selectedFriend: null, friends: initialFriends
-};
-
-function reducer(state, action) {
-  switch (action.type) {
-    case ACTIONS.SET_SHOW_ADD_FRIEND:
-      return {...state, showAddFriend: !state.showAddFriend};
-    case ACTIONS.SET_SELECTED_FRIEND:
-      return {
-        ...state,
-        selectedFriend: state.selectedFriend?.id === action.payload.friend.id ? null : action.payload.friend
-      };
-    case ACTIONS.SET_FRIENDS:
-      return {...state, friends: [...state.friends, action.payload]};
-    case ACTIONS.HANDLE_SPLIT_BILL: {
-      const {selectedFriend, value} = action.payload;
-      if (!selectedFriend) {
-        return state; // Return the current state if there's no selected friend
-      }
-      const updatedFriends = state.friends.map(friend => friend.id === selectedFriend.id ? {
-        ...friend, balance: friend.balance + value
-      } : friend);
-
-      return {
-        ...state, friends: updatedFriends, selectedFriend: null
-      };
+  const handleRemoveFriend = (id) => {
+    setFriends((prev) => prev.filter((friend) => friend.id !== id));
+    if (selectedFriendId === id) {
+      setSelectedFriendId(null);
     }
-
-
-    default:
-      return state;
-  }
-}
-
-
-const App = () => {
-  const [
-          {
-            showAddFriend, selectedFriend, friends
-          }, dispatch
-        ] = useReducer(reducer, initialState);
-
-  // const [showAddFriend, setShowAddFriend]   = useState(false);
-  // const [selectedFriend, setSelectedFriend] = useState(null);
-  // const [friends, setFriends]               = useState(initialFriends);
-  //
-
-  // console.log(selectedFriend);
-  const handleShowAddFriend = function () {
-    // setShowAddFriend(show => !show);
-    dispatch({
-      type: ACTIONS.SET_SHOW_ADD_FRIEND
-    });
+    setExpenses((prev) => prev.filter((expense) => expense.friendId !== id));
   };
 
-  const handleSelection = (friend) => {
-    dispatch({
-      type: ACTIONS.SET_SELECTED_FRIEND, payload: {friend}
-    });
+  const addExpense = ({ description, amount, payer }) => {
+    if (!selectedFriendId) return;
+
+    const expense = {
+      id: Date.now(),
+      description,
+      amount,
+      payer,
+      friendId: selectedFriendId,
+    };
+
+    setExpenses((prev) => [...prev, expense]);
+
+    setFriends((prevFriends) =>
+      prevFriends.map((friend) => {
+        if (friend.id === selectedFriendId) {
+          let newAmount = friend.currentAmount;
+          if (payer === "you") {
+            newAmount += amount; // friend owes you
+          } else if (payer === "friend") {
+            newAmount -= amount; // you owe friend
+          }
+          return { ...friend, currentAmount: newAmount };
+        }
+        return friend;
+      })
+    );
   };
 
-  const handleAddFriend = (friend) => {
-    // setFriends(friends => [...friends, friend]);
-    // setShowAddFriend(false);
-    dispatch({
-      type: ACTIONS.SET_FRIENDS, payload: friend
-    });
-    handleShowAddFriend();
-  };
-
-
-  function handleSplitBill(value) {
-    // setFriends(friends => friends.map(friend => {
-    //   return friend.id === selectedFriend?.id ? {
-    //     ...friend, balance: friend.balance + value
-    //   } : friend;
-    // }));
-    //
-    // setSelectedFriend(null);
-    dispatch({
-      type: ACTIONS.HANDLE_SPLIT_BILL, payload: {selectedFriend, value}
-    });
-
-  };
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   return (
-    <div className={"app"}>
-      <SideBar>
-        <FriendsList
+    <div className={darkMode ? "app dark" : "app light"}>
+      <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <div className="main-container">
+        <FriendList
           friends={friends}
-          selectedFriend={selectedFriend}
-          onSelection={handleSelection}
+          selectedFriendId={selectedFriendId}
+          setSelectedFriendId={setSelectedFriendId}
+          addFriend={addFriend}
+          onRemoveFriend={handleRemoveFriend}
+          darkMode={darkMode}
         />
-        {showAddFriend && <FormToAddFriend onAddFriend={handleAddFriend}/>}
-        <Button
-          onClick={handleShowAddFriend}>{!showAddFriend ? "Add Friend" : "Close"}</Button>
-      </SideBar>
-
-      {selectedFriend && <FormSplitBill selectedFriend={selectedFriend}
-                                        onSplitBill={handleSplitBill}/>}
-
+        <ExpenseForm
+          friends={friends}
+          selectedFriendId={selectedFriendId}
+          onAddExpense={addExpense}
+          darkMode={darkMode}
+        />
+      </div>
     </div>
   );
-};
+}
 
 export default App;
